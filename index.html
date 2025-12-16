@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Syria Gaming Lab - Coming Soon</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      color: #ff223f;
+      font-family: 'Press Start 2P', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      perspective: 1000px;
+      cursor: none;
+    }
+
+    .container {
+      text-align: center;
+      transform-style: preserve-3d;
+      animation: float 8s infinite ease-in-out;
+      position: relative;
+      z-index: 99990;
+    }
+
+    .voxel-text {
+      font-size: 2.5rem;
+      line-height: 1.2;
+      position: relative;
+      letter-spacing: 2px;
+      color: #ff223f;
+      text-shadow:
+        4px 4px 0 rgba(255, 255, 255, 0.8),
+        6px 6px 0 rgba(255, 255, 255, 0.6),
+        8px 8px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .coming-soon {
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+      position: relative;
+      color: #ff223f;
+      text-shadow:
+        2px 2px 0 rgba(255, 255, 255, 0.8),
+        4px 4px 0 rgba(255, 255, 255, 0.6);
+      letter-spacing: 2px;
+      animation: glow 3s infinite alternate;
+    }
+
+    .year {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      position: relative;
+      color: #ff223f;
+      text-shadow:
+        3px 3px 0 rgba(255, 255, 255, 0.8),
+        6px 6px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .grid-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(rgba(255, 34, 63, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 34, 63, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -1;
+      animation: gridMove 20s linear infinite;
+    }
+
+    .pixel-glow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255,34,63,0.3) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(40px);
+      z-index: -1;
+      animation: glowPulse 6s infinite alternate;
+    }
+
+    /* Score display */
+    .score-display {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      color: #ff223f;
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 99999;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .score-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .score-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .score-value {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .site-logo {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 99998;
+      pointer-events: none;
+    }
+
+    .site-logo img {
+      height: 40px;
+      width: auto;
+      display: block;
+    }
+
+    /* Custom cursor */
+    .custom-cursor {
+      position: fixed;
+      width: 24px;
+      height: 24px;
+      border: 2px solid #ff223f;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      transition: transform 0.1s ease, border-color 0.2s ease;
+    }
+
+    .custom-cursor::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 4px;
+      height: 4px;
+      background: #ff223f;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .custom-cursor.clicking {
+      transform: translate(-50%, -50%) scale(0.5);
+      border-color: white;
+    }
+
+    /* Click muzzle flash effect */
+    .muzzle-flash {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      animation: muzzleFlash 0.5s forwards;
+      box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Pixel character heads */
+    .pixel-head {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      pointer-events: auto;
+      z-index: 9997;
+      animation: floatTarget 4s infinite ease-in-out;
+      image-rendering: pixelated;
+    }
+
+    .pixel-head svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotateX(5deg) rotateY(-5deg); }
+      50% { transform: translateY(-20px) rotateX(-5deg) rotateY(5deg); }
+    }
+
+    @keyframes glow {
+      0% { 
+        text-shadow: 
+          2px 2px 0 rgba(255, 255, 255, 0.8),
+          4px 4px 0 rgba(255, 255, 255, 0.6),
+          0 0 10px rgba(255, 34, 63, 0.5);
+      }
+      100% { 
+        text-shadow: 
+          2px 2px 0 rgba(255, 255, 255, 1),
+          4px 4px 0 rgba(255, 255, 255, 0.8),
+          0 0 20px rgba(255, 34, 63, 0.8);
+      }
+    }
+
+    @keyframes glowPulse {
+      0% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); }
+    }
+
+    @keyframes gridMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 40px 40px; }
+    }
+
+    @keyframes muzzleFlash {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.8);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+        box-shadow: 0 0 40px 20px rgba(255, 255, 255, 0);
+      }
+    }
+
+    @keyframes floatTarget {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(8px, -8px) scale(1.2); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    @media (max-width: 768px) {
+      .voxel-text { font-size: 1.8rem; }
+      .coming-soon { font-size: 1rem; }
+      .year { font-size: 1.2rem; }
+      .custom-cursor { width: 20px; height: 20px; }
+      .pixel-head { width: 20px; height: 20px; }
+      .score-display { top: 15px; right: 15px; padding: 6px 10px; }
+      .score-value { font-size: 0.9rem; }
+      .site-logo { top: 15px; left: 15px; }
+      .site-logo img { height: 32px; }
+    }
+
+    @media (max-width: 480px) {
+      .voxel-text { font-size: 1.4rem; line-height: 1.3; }
+      .coming-soon { font-size: 0.8rem; }
+      .year { font-size: 1rem; }
+      .custom-cursor { width: 16px; height: 16px; }
+      .pixel-head { width: 16px; height: 16px; }
+      .score-display { top: 10px; right: 10px; padding: 4px 8px; }
+      .score-value { font-size: 0.8rem; }
+      .score-icon { width: 12px; height: 12px; }
+      .site-logo { top: 10px; left: 10px; }
+      .site-logo img { height: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="site-logo">
+    <img src="Images/Logo.png" alt="Syria Gaming Lab Logo" />
+  </div>
+  <div class="pixel-glow" style="top: 30%; left: 20%;"></div>
+  <div class="pixel-glow" style="top: 70%; left: 80%;"></div>
+
+  <div class="container">
+    <div class="voxel-text">SYRIA GAMING LAB</div>
+    <div class="coming-soon">VERY SOON</div>
+    <div class="year">2026</div>
+  </div>
+
+  <div class="score-display">
+    <div class="score-icon">
+      <svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="8" height="8" fill="white" />
+        <rect x="1" y="1" width="6" height="6" fill="#ff223f" />
+        <rect x="2" y="2" width="1" height="1" fill="#000" />
+        <rect x="5" y="2" width="1" height="1" fill="#000" />
+        <rect x="3" y="5" width="2" height="1" fill="#000" />
+        <rect x="0" y="0" width="1" height="1" fill="#ff223f" />
+        <rect x="7" y="0" width="1" height="1" fill="#ff223f" />
+        <rect x="0" y="7" width="1" height="1" fill="#ff223f" />
+        <rect x="7" y="7" width="1" height="1" fill="#ff223f" />
+      </svg>
+    </div>
+    <div class="score-value" id="score">0</div>
+  </div>
+
+  <div class="custom-cursor" id="cursor"></div>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const body = document.body;
+    const scoreElement = document.getElementById('score');
+    let score = 0;
+    let targets = [];
+    const maxTargets = 12;
+    
+    // Get text element bounds for collision detection
+    function getTextBounds() {
+      const container = document.querySelector('.container');
+      const rect = container.getBoundingClientRect();
+      return {
+        x: rect.left,
+        y: rect.top,
+        width: rect.width,
+        height: rect.height
+      };
+    }
+
+    // Check if position collides with text
+    function collidesWithText(x, y, width = 24, height = 24) {
+      const textBounds = getTextBounds();
+      return !(
+        x + width < textBounds.x || 
+        x > textBounds.x + textBounds.width || 
+        y + height < textBounds.y || 
+        y > textBounds.y + textBounds.height
+      );
+    }
+
+    // Generate a safe position that doesn't collide with text
+    function getSafePosition() {
+      let attempts = 0;
+      const maxAttempts = 50;
+      
+      while (attempts < maxAttempts) {
+        const top = Math.random() * 80 + 10;
+        const left = Math.random() * 80 + 10;
+        
+        // Convert percentage to pixels
+        const x = (left / 100) * window.innerWidth;
+        const y = (top / 100) * window.innerHeight;
+        
+        if (!collidesWithText(x, y)) {
+          return { top, left };
+        }
+        attempts++;
+      }
+      
+      // If we can't find a safe position, use a default safe area
+      const safeAreas = [
+        { top: 15, left: 15 },
+        { top: 15, left: 85 },
+        { top: 85, left: 15 },
+        { top: 85, left: 85 }
+      ];
+      return safeAreas[Math.floor(Math.random() * safeAreas.length)];
+    }
+
+    // Mouse movement
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    // Create a pixel head SVG with white stroke
+    function createPixelHeadSVG(color = '#ff223f') {
+      return `<svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg">
+        <!-- White outline/stroke -->
+        <rect x="0" y="0" width="8" height="8" fill="white" />
+        <rect x="1" y="1" width="6" height="6" fill="${color}" />
+        <rect x="2" y="2" width="1" height="1" fill="#000" />
+        <rect x="5" y="2" width="1" height="1" fill="#000" />
+        <rect x="3" y="5" width="2" height="1" fill="#000" />
+        <!-- Corner pixels for better outline -->
+        <rect x="0" y="0" width="1" height="1" fill="${color}" />
+        <rect x="7" y="0" width="1" height="1" fill="${color}" />
+        <rect x="0" y="7" width="1" height="1" fill="${color}" />
+        <rect x="7" y="7" width="1" height="1" fill="${color}" />
+      </svg>`;
+    }
+
+    // Create a new pixel head at random position (avoiding text)
+    function createTarget() {
+      if (targets.length >= maxTargets) return;
+      
+      const safePos = getSafePosition();
+      const target = document.createElement('div');
+      target.className = 'pixel-head';
+      target.style.cssText = `
+        position: absolute;
+        top: ${safePos.top}%;
+        left: ${safePos.left}%;
+        animation: floatTarget 4s infinite ease-in-out;
+        animation-delay: ${Math.random() * 4}s;
+        pointer-events: auto;
+        z-index: 9997;
+      `;
+      target.innerHTML = createPixelHeadSVG();
+      body.appendChild(target);
+      targets.push(target);
+      
+      // Remove from array when destroyed
+      target.addEventListener('transitionend', () => {
+        if (parseFloat(target.style.opacity) <= 0.1) {
+          target.remove();
+          targets = targets.filter(t => t !== target);
+          // Spawn a new one after a delay
+          setTimeout(createTarget, 800);
+        }
+      });
+    }
+
+    // Click effect - Muzzle Flash and target killing
+    document.addEventListener('mousedown', (e) => {
+      cursor.classList.add('clicking');
+      
+      // Create muzzle flash effect
+      const muzzleFlash = document.createElement('div');
+      muzzleFlash.className = 'muzzle-flash';
+      muzzleFlash.style.left = e.clientX + 'px';
+      muzzleFlash.style.top = e.clientY + 'px';
+      body.appendChild(muzzleFlash);
+      
+      // Remove muzzle flash after animation
+      setTimeout(() => {
+        muzzleFlash.remove();
+      }, 500);
+      
+      // Check if clicked on a target
+      const targetsToCheck = [...targets];
+      targetsToCheck.forEach(target => {
+        const rect = target.getBoundingClientRect();
+        if (
+          e.clientX >= rect.left && 
+          e.clientX <= rect.right && 
+          e.clientY >= rect.top && 
+          e.clientY <= rect.bottom
+        ) {
+          // Kill the target with explosion effect
+          target.style.transform = 'scale(0) rotate(180deg)';
+          target.style.opacity = '0';
+          target.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+          
+          // Create explosion particles
+          for (let i = 0; i < 8; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'click-particle';
+            particle.style.cssText = `
+              position: absolute;
+              width: 6px;
+              height: 6px;
+              background: #ff223f;
+              border-radius: 50%;
+              left: ${rect.left + rect.width/2}px;
+              top: ${rect.top + rect.height/2}px;
+              pointer-events: none;
+              z-index: 9998;
+              animation: particleExplode 0.8s forwards;
+            `;
+            
+            // Random direction for each particle
+            const angle = (i / 8) * Math.PI * 2;
+            const distance = 40 + Math.random() * 30;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            particle.style.setProperty('--tx', tx + 'px');
+            particle.style.setProperty('--ty', ty + 'px');
+            
+            body.appendChild(particle);
+            
+            // Remove particle after animation
+            setTimeout(() => {
+              particle.remove();
+            }, 800);
+          }
+          
+          // Update score
+          score++;
+          scoreElement.textContent = score;
+        }
+      });
+    });
+
+    document.addEventListener('mouseup', () => {
+      cursor.classList.remove('clicking');
+    });
+
+    // Initialize targets
+    for (let i = 0; i < maxTargets; i++) {
+      setTimeout(() => createTarget(), i * 300);
+    }
+
+    // Add subtle mouse move effect for main text
+    const container = document.querySelector('.container');
+    document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 20;
+      const y = (e.clientY / window.innerHeight - 0.5) * 20;
+      container.style.transform = `translateY(-50%) rotateX(${y}deg) rotateY(${x}deg)`;
+    });
+
+    // Add keyframes for particle explosion via JavaScript
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes particleExplode {
+        0% {
+          transform: translate(0, 0) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(var(--tx), var(--ty)) scale(0);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      // Re-check positions on resize (simplified approach)
+      targets.forEach(target => {
+        const rect = target.getBoundingClientRect();
+        if (collidesWithText(rect.left, rect.top)) {
+          // Move to safe position
+          const safePos = getSafePosition();
+          target.style.top = `${safePos.top}%`;
+          target.style.left = `${safePos.left}%`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
